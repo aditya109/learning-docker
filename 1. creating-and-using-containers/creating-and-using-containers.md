@@ -562,6 +562,14 @@ Aditya :: System32 » docker container inspect --format "{{ .NetworkSettings.IPA
 172.17.0.2
 ```
 
+
+
+
+
+
+
+
+
 ```powershell
 
 ```
