@@ -4,8 +4,8 @@
 
 - [x] `nginx` should listen on `80:80`, `httpd` on `8080:80`, `mysql` on `3306:3306`.
 - [x] When running `mysql`, use the `--env` option (or `-e`) to pass in `MYSQL_RANDOM_ROOT_PASSWORD=yes`. Use`docker container logs` on `mysql` to find the random password it created on startup.
-- [ ] Clean it all up with `docker container stop` and `docker container rm`.
-- [ ] Use `docker container ls` to ensure everything is correct before and after cleanup.
+- [x] Clean it all up with `docker container stop` and `docker container rm`.
+- [x] Use `docker container ls` to ensure everything is correct before and after cleanup.
 
 ## Solution
 

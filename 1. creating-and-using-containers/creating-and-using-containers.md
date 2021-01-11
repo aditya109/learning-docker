@@ -197,6 +197,8 @@ docker container stop mongo
 
 and we will get the same process but running on a different port.
 
+If we want to remove all containers at once, we type `docker containers 
+
 **Assignment: Manage multiple containers**
 
 ## CLI Process Monitoring
@@ -562,15 +564,315 @@ Aditya :: System32 » docker container inspect --format "{{ .NetworkSettings.IPA
 172.17.0.2
 ```
 
+## CLI Management of Virtual Networks
 
+- `docker network ls` shows networks.
 
+  ```powershell
+  Aditya :: learning-docker » docker network ls
+  NETWORK ID     NAME      DRIVER    SCOPE
+  de2e69bf271d   bridge    bridge    local
+  6c467bd0fda4   host      host      local
+  202ce568f0b7   none      null      local
+  ```
 
+  > `--network bridge` Default Docker virtual network, which is NAT'd behind the Host IP.
 
+- `docker network inspect NETWORK_NAME` inspects a network.
 
+  ```powershell
+  Aditya :: learning-docker » docker network inspect bridge
+  [
+      {
+          "Name": "bridge",
+          "Id": "de2e69bf271d31e1a39f0f21d1a973f438d0cb1c76d04d3775338fbc82023ba3",
+          "Created": "2021-01-06T02:42:08.6789436Z",
+          "Scope": "local",
+          "Driver": "bridge",
+          "EnableIPv6": false,
+          "IPAM": {
+              "Driver": "default",
+              "Options": null,
+              "Config": [
+                  {
+                      "Subnet": "172.17.0.0/16",			👈
+                      "Gateway": "172.17.0.1"				👈
+                  }
+              ]
+          },
+          "Internal": false,
+          "Attachable": false,
+          "Ingress": false,
+          "ConfigFrom": {
+              "Network": ""
+          },
+          "ConfigOnly": false,
+          "Containers": {
+              "af5a5abab1de02fed5d1bee3c19ed49054587ec2efa1c42f1fae5e1adfa30de4": {
+                  "Name": "proxy",
+                  "EndpointID": "463928ba98a0fb740e32de3cc6c2ed0f9c2ba4c73dcda1cc306037a42093d072",
+                  "MacAddress": "02:42:ac:11:00:02",
+                  "IPv4Address": "172.17.0.2/16",
+                  "IPv6Address": ""
+              }
+          },
+          "Options": {
+              "com.docker.network.bridge.default_bridge": "true",
+              "com.docker.network.bridge.enable_icc": "true",
+              "com.docker.network.bridge.enable_ip_masquerade": "true",
+              "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+              "com.docker.network.bridge.name": "docker0",
+              "com.docker.network.driver.mtu": "1500"
+          },
+          "Labels": {}
+      }
+  ]
+  ```
 
+  > `--network host` gains performance by skipping virtual networks but sacrifices security of container model.
+  >
+  > `--network none` removes `eth0` and only leaves you with localhost interface in container.
 
+- `docker network create --driver DRIVER_NAME` create a network, spawns a new virtual network for you to attach containers.
+
+  ```powershell
+  Aditya :: learning-docker » docker network create my_app_net
+  973176dc6a251d003a8b649b2c495c3d800ad4878b867a25e509fe858b9cf2f1
+  ```
+
+  ```powershell
+  Aditya :: learning-docker » docker network ls
+  NETWORK ID     NAME         DRIVER    SCOPE
+  de2e69bf271d   bridge       bridge    local
+  6c467bd0fda4   host         host      local
+  973176dc6a25   my_app_net   bridge    local
+  202ce568f0b7   none         null      local
+  ```
+
+  > `network driver` They are built-in or third-party extensions that give you virtual network features.
+
+- `docker network connect` attaches a network to container.
+
+  ```powershell
+  Aditya :: System32 » docker network connect my_app_net proxy
+  Aditya :: System32 » docker container inspect proxy
+  [
+      {
+          ....,
+          "NetworkSettings": {
+              ....,
+              "Networks": {
+                  "bridge": {
+                      "IPAMConfig": null,
+                      "Links": null,
+                      "Aliases": null,
+                      "NetworkID": "4b999276351265f09f9698b36eb2b73257279ca97b461d201dabc949c196f52c",                    "EndpointID": "71c5679c7a8cdb376644ca9569a15e22a38a0d21dac01e069cc438e22fd63029",
+                      "Gateway": "172.17.0.1",
+                      "IPAddress": "172.17.0.2",
+                      "IPPrefixLen": 16,
+                      "IPv6Gateway": "",
+                      "GlobalIPv6Address": "",
+                      "GlobalIPv6PrefixLen": 0,
+                      "MacAddress": "02:42:ac:11:00:02",
+                      "DriverOpts": null
+                  },
+                  "my_app_net": {
+                      "IPAMConfig": {},
+                      "Links": null,
+                      "Aliases": [
+                          "af5a5abab1de"
+                      ],
+                      "NetworkID": "bd382ea27e51ee7563c708fbfb94183ac626eb652d3430e9db433f23dc4f0b78",                    "EndpointID": "45ad21a59a842c7b3f3a20d3e45224cd76a9203766bb4da91547e8e002d1ba61",
+                      "Gateway": "172.18.0.1",
+                      "IPAddress": "172.18.0.2",
+                      "IPPrefixLen": 16,
+                      "IPv6Gateway": "",
+                      "GlobalIPv6Address": "",
+                      "GlobalIPv6PrefixLen": 0,
+                      "MacAddress": "02:42:ac:12:00:02",
+                      "DriverOpts": {}
+                 }
+              }
+          }
+      }
+  ]
+  ```
+
+- `docker network disconnect` detach a network from container.
 
 ```powershell
-
+Aditya :: System32 » docker network disconnect my_app_net proxy
+Aditya :: System32 » docker container inspect proxy
+[
+    {
+        .....,
+        "NetworkSettings": {
+            ....,
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "4b999276351265f09f9698b36eb2b73257279ca97b461d201dabc949c196f52c",
+                    "EndpointID": "71c5679c7a8cdb376644ca9569a15e22a38a0d21dac01e069cc438e22fd63029",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]
 ```
+
+## Docker Networks: DNS
+
+<img src="https://raw.githubusercontent.com/aditya109/learning-docker/main/assets/diag0.svg"/>
+
+> Static IP's and using IP's for talking to containers is an anti-pattern. Do your best to avoid it.
+
+## Docker DNS
+
+Docker daemon has a built-in DNS server that containers use by-default.
+
+```powershell
+Aditya :: System32 » docker network connect my_app_net proxy
+Aditya :: System32 » docker network inspect my_app_net
+[
+    {
+        "Name": "my_app_net",
+        "Id": "bd382ea27e51ee7563c708fbfb94183ac626eb652d3430e9db433f23dc4f0b78",
+        "Created": "2021-01-06T09:19:25.4270614Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "af5a5abab1de02fed5d1bee3c19ed49054587ec2efa1c42f1fae5e1adfa30de4": {
+                "Name": "proxy",
+                "EndpointID": "b8dc65eaa0d7bf351d7d3e7a61b5ab9e5a7e4baaa3391279cf2daa0118e1bdba",
+                "MacAddress": "02:42:ac:12:00:02",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
+```
+
+Docker defaults the hostname to the container's name, but you can also set aliases.
+
+Let's create another container under `my_app_net` network.
+
+```powershell
+Aditya :: System32 » docker container run --publish 5001:80 --name app1 --detach --network my_app_net nginx:alpine
+8e71ef45d862e3a15e10317e5568b125add2cb959644688aadf9244688495fdd
+Aditya :: System32 » docker container run --publish 5002:80 --name app2 --detach --network my_app_net nginx:alpine
+a6c80a468966c83f1686da5db59ae50d479afd251f67bb932f1c9ff0e1149ab2
+Aditya :: System32 » docker network inspect my_app_net
+[
+    {
+        "Name": "my_app_net",
+        "Id": "bd382ea27e51ee7563c708fbfb94183ac626eb652d3430e9db433f23dc4f0b78",
+        "Created": "2021-01-06T09:19:25.4270614Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "8e71ef45d862e3a15e10317e5568b125add2cb959644688aadf9244688495fdd": {
+                "Name": "app1",
+                "EndpointID": "9eb326edbc0954bc9cdaeffa45a94eeb9fdb001cfebba38e88c16c153a0be0ca",
+                "MacAddress": "02:42:ac:12:00:02",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            },
+            "a6c80a468966c83f1686da5db59ae50d479afd251f67bb932f1c9ff0e1149ab2": {
+                "Name": "app2",
+                "EndpointID": "1f401641d87f82671758ae6f922a2a53b37e8b798fa2d5d1d1a4f30cd92faf66",
+                "MacAddress": "02:42:ac:12:00:03",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            },
+            "c92399081ac7dd63ef330d4255e896fda423d29b9c882ed915b47aa120d621db": {
+                "Name": "app3",
+                "EndpointID": "128326b21568c7de832289e8ef29b9aafac8d9fe3b3cc7bd1bb0d72d8004bf44",
+                "MacAddress": "02:42:ac:12:00:04",
+                "IPv4Address": "172.18.0.4/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
+```
+
+```powershell
+Aditya :: System32 » docker container run --publish 5003:80 --name app3 -it --network my_app_net nginx:alpine ping app1
+PING app1 (172.18.0.2): 56 data bytes
+64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.130 ms
+64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.082 ms
+64 bytes from 172.18.0.2: seq=2 ttl=64 time=0.187 ms
+64 bytes from 172.18.0.2: seq=3 ttl=64 time=0.187 ms
+64 bytes from 172.18.0.2: seq=4 ttl=64 time=0.242 ms
+64 bytes from 172.18.0.2: seq=5 ttl=64 time=0.184 ms
+64 bytes from 172.18.0.2: seq=6 ttl=64 time=0.162 ms
+64 bytes from 172.18.0.2: seq=7 ttl=64 time=0.182 ms
+64 bytes from 172.18.0.2: seq=8 ttl=64 time=0.140 ms
+64 bytes from 172.18.0.2: seq=9 ttl=64 time=0.183 ms
+^C
+--- app1 ping statistics ---
+10 packets transmitted, 10 packets received, 0% packet loss
+round-trip min/avg/max = 0.082/0.167/0.242 ms
+```
+
+The default network **bridge** does not have DNS built into it, however a work-around has been provided. We could `--link` for our containers; but it s better to create a new network.
+
+**Assignment: CLI App Testing**
+
+**Assignment: DNS Round Robin Test**
+
+>  `docker container run --rm alpine nslookup search `automatically remove the container when it exits.
+
+
 
