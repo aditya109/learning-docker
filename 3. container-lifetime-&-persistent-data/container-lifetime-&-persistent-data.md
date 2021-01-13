@@ -1,6 +1,12 @@
 # Table of Contents
 
+- [Container Lifetime and Persistent Data](#container-lifetime-and-persistent-data)
+  * [Introduction](#introduction)
+  * [Persistent Data: Data Volumes](#persistent-data--data-volumes)
+    + [Learning `—format` flag for Docker Commands](#learning---format--flag-for-docker-commands)
+  * [Persistent Data: Data Mounting](#persistent-data--data-mounting)
 
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 # Container Lifetime and Persistent Data
 
