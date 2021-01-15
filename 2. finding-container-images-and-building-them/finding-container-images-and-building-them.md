@@ -1,9 +1,10 @@
 # Table of Contents
 
-- [Docker Hub Registry](#docker-hub-registry)
+- [What is an Image?](#what-is-an-image-)
 - [Images and Their Layers: Image Cache](#images-and-their-layers--image-cache)
 - [Image Tagging and Pushing to Docker Hub](#image-tagging-and-pushing-to-docker-hub)
 - [Dockerfile](#dockerfile)
+    + [Taking Care on Environment Variables](#taking-care-on-environment-variables)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -174,11 +175,39 @@ docker image build -t [img_name] .
 
 `docker system df` to see space usage
 
- 
+### Taking Care on Environment Variables
+
+When using Docker, we distinguish between 2 types of environment variables:
+
+- `ARG` also known as **build-time variables**. They are only available from the moment they are announced in the Dockerfile with an `ARG`  instruction up to the moment when the image is built.
+  Running containers can't access values of `ARG` variables. This also applies to `CMD` and `ENTRYPOINT` instructions which just tell what the container should run by default.
+
+  > If you tell a Dockerfile to expect various `ARG` variables without a default value specified but none are provided when running the `build` command, there will be an error message.
+  >
+  > However, `ARG` values can be easily inspected after an image is built, by viewing the `docker history` of an image. Thus they are a poor choice for sensitive data.
+
+- `ENV` variables are also available during the build, as soon as you introduce them with an `ENV` instruction. However, unlike `ARG`, they are also accessible by containers started from the final image. `ENV` values can be overridden when starting a container.
+
+![](https://raw.githubusercontent.com/aditya109/learning-docker/main/assets/argvsenv.svg)
+
+#### Setting `ARG` Values
+
+These can be left blank in the Dockerfile, or set default values. If you don't provide a value to expected `ARG` variables which don't have a default, you'll get an error message.
+
+Here is a Dockerfile example, both for default values and without them:
+
+```dockerfile
+ARG some_variable_name
+# or with a hard-coded default:
+#ARG some_variable_name=default_value
+
+RUN echo "Oh dang look at that $some_variable_name"
+# you could also use braces - ${some_variable_name}
+```
 
 
 
-
+> [Docker ARG, ENV and .env - a Complete Guide · vsupalov.com](https://vsupalov.com/docker-arg-env-variable-guide/)
 
 
 
