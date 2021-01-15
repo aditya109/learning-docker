@@ -1,3 +1,12 @@
+# Table of Contents
+
+- [Docker Compose: Multi Container tool](#docker-compose--multi-container-tool)
+  * [Why use `docker-compose` ?](#why-use--docker-compose---)
+  * [`docker-compose.yml`](#-docker-composeyml-)
+  * [Building Images using `docker-compose.yml`](#building-images-using--docker-composeyml-)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 # Docker Compose: Multi Container tool
 
 ## Why use `docker-compose` ?

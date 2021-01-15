@@ -1,3 +1,18 @@
+# Table of Contents
+
+- [Creating and Using Containers](#creating-and-using-containers)
+  * [Check our Docker Install and Config](#check-our-docker-install-and-config)
+  * [Starting a Nginx Web Server](#starting-a-nginx-web-server)
+  * [Containers v/s VMs](#containers-v-s-vms)
+  * [CLI Process Monitoring](#cli-process-monitoring)
+  * [Getting into a Shell inside Containers](#getting-into-a-shell-inside-containers)
+  * [Docker Networking](#docker-networking)
+  * [CLI Management of Virtual Networks](#cli-management-of-virtual-networks)
+  * [Docker Networks: DNS](#docker-networks--dns)
+  * [Docker DNS](#docker-dns)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 # Creating and Using Containers
 
 ## Check our Docker Install and Config

@@ -1,3 +1,18 @@
+# Table of Contents
+
+- [Docker in Production](#docker-in-production)
+  * [Limit your Simultaneous Innovation](#limit-your-simultaneous-innovation)
+  * [Legacy apps work in Containers too](#legacy-apps-work-in-containers-too)
+  * [Focus: Dockerfiles](#focus--dockerfiles)
+  * [Docker Maturity Model](#docker-maturity-model)
+    + [Dockerfile Anti-Pattern: Trapping Data](#dockerfile-anti-pattern--trapping-data)
+    + [Dockerfile Anti-Pattern: Using Latest](#dockerfile-anti-pattern--using-latest)
+    + [Dockerfile Anti-Pattern: Leaving Default Config](#dockerfile-anti-pattern--leaving-default-config)
+    + [Dockerfile Anti-Pattern: Environment Specific](#dockerfile-anti-pattern--environment-specific)
+  * [Big 3 Infrastructure Decisions](#big-3-infrastructure-decisions)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 # Docker in Production
 
 ## Limit your Simultaneous Innovation
@@ -106,5 +121,5 @@
   - At first, match your existing deployment process
   - Consider changing to `Alpine` later, maybe much later.
 
-### 
+
 
