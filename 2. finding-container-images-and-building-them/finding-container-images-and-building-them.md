@@ -5,6 +5,11 @@
 - [Image Tagging and Pushing to Docker Hub](#image-tagging-and-pushing-to-docker-hub)
 - [Dockerfile](#dockerfile)
     + [Taking Care on Environment Variables](#taking-care-on-environment-variables)
+      - [Setting `ARG` Values](#setting--arg--values)
+      - [Setting `ENV` Values](#setting--env--values)
+        * [Provide values one by one](#provide-values-one-by-one)
+        * [Pass environment variables values from your host](#pass-environment-variables-values-from-your-host)
+        * [Take values from a file (env_file)](#take-values-from-a-file--env-file-)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -205,9 +210,133 @@ RUN echo "Oh dang look at that $some_variable_name"
 # you could also use braces - ${some_variable_name}
 ```
 
+When building a Docker image from the command-line, you can set `ARG` values using `--build-arg`:
+
+```bash
+docker build --build-arg some_variable_name=a_value
+```
+
+This can be translated to using `docker-compose.yml` files. When using `docker-compose`, you can specify values to pass on for `ARG`, you can specify values to pass on for `ARG`, in an `args` block:
+
+```yaml
+version: '3'
+
+services:
+	somename:
+		build:
+			context: ./app
+			dockerfile: Dockerfile
+			args:
+				some_variable_name: a_value
+```
+
+> When you try to set a variable which is not `ARG` mentioned in the Dockerfile, Docker will complain.
+
+#### Setting `ENV` Values
+
+We can do it when starting your containers, but you can also provide default `ENV` values directly in your Dockerfile by hard-coding them.
+
+Also, you can set dynamic default values for environment variables.
+
+When building an image, the only thing you can provide are `ARG` values, as described below. You can't provide values for `ENV` variables directly.
+
+However, both `ARG` and `ENV` can work together. You can use `ARG` to set the default values of `ENV` variables. 
+
+```dockerfile
+# no default value
+ENV hey
+
+# a default value
+ENV foo /bar
+
+# or ENV foo=/bar
+
+# ENV values can be used during the build
+ADD . $foo
+
+# or ADD . ${foo}
+# translates to: ADD . /bar
+```
+
+And here is a snippet for a Dockerfile, using dynamic on-build `ENV` values:
+
+```dockerfile
+# expect a build-time variable
+ARG A_VARIABLE
+
+# use the value to set the ENV var default
+ENV an_env_var=$A_VARIABLE
+
+# if not overridden, that value of an_env_var will be available to your containers !
+```
+
+Once the image is built, you can launch containers and provide values for `ENV` variables in *three different ways*, either from the command line or using a `docker-compose.yml` file. All of those will override any default `ENV` values in the Dockerfile.
+Unlike `ARG`, you can pass all kinds of environment variables to the container. Even ones not explicitly defined in the Dockerfile. It depends on your application whether that'll do anything however.
+
+##### Provide values one by one
+
+```bash
+docker run -e "env_var_name=another_value" alpine env
+```
+
+For a `docker-compose.yml` file:
+
+```yaml
+version: '3'
+
+services:
+	plex:
+		image: linuxserver/plex
+			environment:
+				- env_var_name=another_value
+```
+
+##### Pass environment variables values from your host
+
+```bash
+docker run -e env_var_name alpine env
+```
+
+For the `docker-compose.yml` file, leave out the equation sign and everything after it for the same effect.
+
+```yaml
+version: '3'
+
+services:
+	plex:
+		image: linuxserver/plex
+			environment:
+				- env_var_name
+```
+
+##### Take values from a file (env_file)
+
+Instead of writing the variables out or hard_coding them, we can specify a file to read values from.
+
+The file looks something like this:
+
+```
+env_var_name=another_value
+```
+
+The file above is called `env_file_name` and it's located in the current directory.
+
+```bash
+docker run --env-file=env-file-name alpine env
+```
+
+For the `docker-compose.yml` file, we just reference a `env_file`, and Docker parses it for the variables to set.
+
+```yaml
+version: '3'
+
+services:
+	plex:
+		image: linuxserver/plex
+		env_file: env_file_name
+```
 
 
-> [Docker ARG, ENV and .env - a Complete Guide · vsupalov.com](https://vsupalov.com/docker-arg-env-variable-guide/)
 
 
 
