@@ -222,12 +222,12 @@ This can be translated to using `docker-compose.yml` files. When using `docker-c
 version: '3'
 
 services:
-	somename:
-		build:
-			context: ./app
-			dockerfile: Dockerfile
-			args:
-				some_variable_name: a_value
+  somename:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        some_variable_name: a_value
 ```
 
 > When you try to set a variable which is not `ARG` mentioned in the Dockerfile, Docker will complain.
@@ -285,10 +285,10 @@ For a `docker-compose.yml` file:
 version: '3'
 
 services:
-	plex:
-		image: linuxserver/plex
-			environment:
-				- env_var_name=another_value
+  plex:
+    image: linuxserver/plex
+    environment:
+      - env_var_name=another_value
 ```
 
 ##### Pass environment variables values from your host
@@ -303,10 +303,10 @@ For the `docker-compose.yml` file, leave out the equation sign and everything af
 version: '3'
 
 services:
-	plex:
-		image: linuxserver/plex
-			environment:
-				- env_var_name
+  plex:
+    image: linuxserver/plex
+    environment:
+      - env_var_name
 ```
 
 ##### Take values from a file (env_file)
@@ -331,9 +331,9 @@ For the `docker-compose.yml` file, we just reference a `env_file`, and Docker pa
 version: '3'
 
 services:
-	plex:
-		image: linuxserver/plex
-		env_file: env_file_name
+  plex:
+    image: linuxserver/plex
+    env_file: env_file_name
 ```
 
 
